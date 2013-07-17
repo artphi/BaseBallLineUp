@@ -12,20 +12,23 @@ import org.jdom2.output.*;
 abstract class XmlManager {
 
 	
-		   static Element root = new Element("rooster");
+		   static Element root = new Element("roster");
+		   static Attribute rostername;
 		   static org.jdom2.Document document = new Document(root);
 
-		   public static String save(ArrayList<Player> players, String filename)
+		   public static String save(Roster roster, String filename)
 		   {
+			   ArrayList<Player> players = roster.getPlayers();
+			   rostername = new Attribute("name",roster.getRosterName());
 			   for (Player p : players){
+				   	
+				    Element player = new Element("player");
+				    root.addContent(player);
 
-				      Element player = new Element("player");
-				      root.addContent(player);
-
-				      Attribute name = new Attribute("name",p.getName());
-				      Attribute position = new Attribute("name",String.valueOf(p.getPosition()));
-				      player.setAttribute(name);
-				      player.setAttribute(position);
+				    Attribute name = new Attribute("name",p.getName());
+				    Attribute position = new Attribute("name",String.valueOf(p.getPosition()));
+				    player.setAttribute(name);
+				    player.setAttribute(position);
 			   }
 		      
 			   try
@@ -43,8 +46,10 @@ abstract class XmlManager {
 
 		   }
 		   
-		   public static ArrayList<Player> load(String filename){
+		   public static Roster load(String filename){
+			   Roster roster = null;
 			   ArrayList<Player> players = new ArrayList<Player>();
+			   String rosterName = "";
 			 //On crée une instance de SAXBuilder
 			      SAXBuilder sxb = new SAXBuilder();
 			      try
@@ -57,7 +62,7 @@ abstract class XmlManager {
 
 			      //On initialise un nouvel élément racine avec l'élément racine du document.
 			      root = document.getRootElement();
-			      
+			      	 rosterName = root.getAttributeValue("name");
 			         //On crée une List contenant tous les noeuds "etudiant" de l'Element racine
 			         List roosterList = root.getChildren("player");
 
@@ -73,9 +78,9 @@ abstract class XmlManager {
 			            //On affiche le nom de l’élément courant
 			            players.add(p);
 			         }
-			      
+			      roster = new Roster(players, rosterName);
 			   
-			return players;
+			return roster;
 			   
 		   }
 		
